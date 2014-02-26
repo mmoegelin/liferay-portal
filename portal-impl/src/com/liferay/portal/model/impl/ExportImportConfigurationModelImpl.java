@@ -34,8 +34,9 @@ import com.liferay.portal.model.ExportImportConfiguration;
 import com.liferay.portal.model.ExportImportConfigurationModel;
 import com.liferay.portal.model.ExportImportConfigurationSoap;
 import com.liferay.portal.model.TrashedModel;
+import com.liferay.portal.model.User;
 import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.util.PortalUtil;
+import com.liferay.portal.service.UserLocalServiceUtil;
 
 import com.liferay.portlet.expando.model.ExpandoBridge;
 import com.liferay.portlet.expando.util.ExpandoBridgeFactoryUtil;
@@ -414,12 +415,18 @@ public class ExportImportConfigurationModelImpl extends BaseModelImpl<ExportImpo
 
 	@Override
 	public String getUserUuid() throws SystemException {
-		return PortalUtil.getUserValue(getUserId(), "uuid", _userUuid);
+		try {
+			User user = UserLocalServiceUtil.getUserById(getUserId());
+
+			return user.getUuid();
+		}
+		catch (PortalException pe) {
+			return StringPool.BLANK;
+		}
 	}
 
 	@Override
 	public void setUserUuid(String userUuid) {
-		_userUuid = userUuid;
 	}
 
 	@JSON
@@ -569,13 +576,18 @@ public class ExportImportConfigurationModelImpl extends BaseModelImpl<ExportImpo
 
 	@Override
 	public String getStatusByUserUuid() throws SystemException {
-		return PortalUtil.getUserValue(getStatusByUserId(), "uuid",
-			_statusByUserUuid);
+		try {
+			User user = UserLocalServiceUtil.getUserById(getStatusByUserId());
+
+			return user.getUuid();
+		}
+		catch (PortalException pe) {
+			return StringPool.BLANK;
+		}
 	}
 
 	@Override
 	public void setStatusByUserUuid(String statusByUserUuid) {
-		_statusByUserUuid = statusByUserUuid;
 	}
 
 	@JSON
@@ -1150,7 +1162,6 @@ public class ExportImportConfigurationModelImpl extends BaseModelImpl<ExportImpo
 	private long _originalCompanyId;
 	private boolean _setOriginalCompanyId;
 	private long _userId;
-	private String _userUuid;
 	private String _userName;
 	private Date _createDate;
 	private Date _modifiedDate;
@@ -1164,7 +1175,6 @@ public class ExportImportConfigurationModelImpl extends BaseModelImpl<ExportImpo
 	private int _originalStatus;
 	private boolean _setOriginalStatus;
 	private long _statusByUserId;
-	private String _statusByUserUuid;
 	private String _statusByUserName;
 	private Date _statusDate;
 	private long _columnBitmask;

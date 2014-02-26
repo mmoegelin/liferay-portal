@@ -15,6 +15,7 @@
 package com.liferay.portal.model.impl;
 
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.json.JSON;
 import com.liferay.portal.kernel.lar.StagedModelType;
@@ -27,6 +28,7 @@ import com.liferay.portal.model.User;
 import com.liferay.portal.model.UserModel;
 import com.liferay.portal.model.UserSoap;
 import com.liferay.portal.service.ServiceContext;
+import com.liferay.portal.service.UserLocalServiceUtil;
 import com.liferay.portal.util.PortalUtil;
 
 import com.liferay.portlet.expando.model.ExpandoBridge;
@@ -652,12 +654,18 @@ public class UserModelImpl extends BaseModelImpl<User> implements UserModel {
 
 	@Override
 	public String getUserUuid() throws SystemException {
-		return PortalUtil.getUserValue(getUserId(), "uuid", _userUuid);
+		try {
+			User user = UserLocalServiceUtil.getUserById(getUserId());
+
+			return user.getUuid();
+		}
+		catch (PortalException pe) {
+			return StringPool.BLANK;
+		}
 	}
 
 	@Override
 	public void setUserUuid(String userUuid) {
-		_userUuid = userUuid;
 	}
 
 	public long getOriginalUserId() {
@@ -2025,7 +2033,6 @@ public class UserModelImpl extends BaseModelImpl<User> implements UserModel {
 	private String _uuid;
 	private String _originalUuid;
 	private long _userId;
-	private String _userUuid;
 	private long _originalUserId;
 	private boolean _setOriginalUserId;
 	private long _companyId;

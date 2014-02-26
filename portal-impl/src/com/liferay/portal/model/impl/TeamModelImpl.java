@@ -15,6 +15,7 @@
 package com.liferay.portal.model.impl;
 
 import com.liferay.portal.kernel.bean.AutoEscapeBeanHandler;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.json.JSON;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -25,8 +26,9 @@ import com.liferay.portal.model.CacheModel;
 import com.liferay.portal.model.Team;
 import com.liferay.portal.model.TeamModel;
 import com.liferay.portal.model.TeamSoap;
+import com.liferay.portal.model.User;
 import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.util.PortalUtil;
+import com.liferay.portal.service.UserLocalServiceUtil;
 
 import com.liferay.portlet.expando.model.ExpandoBridge;
 import com.liferay.portlet.expando.util.ExpandoBridgeFactoryUtil;
@@ -322,12 +324,18 @@ public class TeamModelImpl extends BaseModelImpl<Team> implements TeamModel {
 
 	@Override
 	public String getUserUuid() throws SystemException {
-		return PortalUtil.getUserValue(getUserId(), "uuid", _userUuid);
+		try {
+			User user = UserLocalServiceUtil.getUserById(getUserId());
+
+			return user.getUuid();
+		}
+		catch (PortalException pe) {
+			return StringPool.BLANK;
+		}
 	}
 
 	@Override
 	public void setUserUuid(String userUuid) {
-		_userUuid = userUuid;
 	}
 
 	@JSON
@@ -691,7 +699,6 @@ public class TeamModelImpl extends BaseModelImpl<Team> implements TeamModel {
 	private long _teamId;
 	private long _companyId;
 	private long _userId;
-	private String _userUuid;
 	private String _userName;
 	private Date _createDate;
 	private Date _modifiedDate;

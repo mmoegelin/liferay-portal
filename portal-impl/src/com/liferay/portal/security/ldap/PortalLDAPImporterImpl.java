@@ -44,8 +44,6 @@ import com.liferay.portal.model.Role;
 import com.liferay.portal.model.RoleConstants;
 import com.liferay.portal.model.User;
 import com.liferay.portal.model.UserGroup;
-import com.liferay.portal.security.auth.ScreenNameGenerator;
-import com.liferay.portal.security.auth.ScreenNameGeneratorFactory;
 import com.liferay.portal.service.CompanyLocalServiceUtil;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.LockLocalServiceUtil;
@@ -1253,16 +1251,7 @@ public class PortalLDAPImporterImpl implements PortalLDAPImporter {
 		}
 
 		if (Validator.isNull(ldapUser.getScreenName())) {
-			ldapUser.setAutoScreenName(true);
-		}
-
-		if (ldapUser.isAutoScreenName()) {
-			ScreenNameGenerator screenNameGenerator =
-				ScreenNameGeneratorFactory.getInstance();
-
-			ldapUser.setScreenName(
-				screenNameGenerator.generate(
-					companyId, user.getUserId(), ldapUser.getEmailAddress()));
+			ldapUser.setScreenName(user.getScreenName());
 		}
 
 		if (ldapUser.isUpdatePassword()) {
